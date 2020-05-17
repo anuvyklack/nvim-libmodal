@@ -277,7 +277,7 @@ Using a callback `function`: >
 		if fooModeInputHistory[1] == 'z' then
 			if fooModeInputHistory[2] == 'f' then
 				if fooModeInputHistory[3] == 'o' then
-					api.nvim_command("echom 'It works!'")
+					print('It works!')
 				else index = 3 end
 			else index = 2 end
 		end
