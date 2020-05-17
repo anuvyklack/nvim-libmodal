@@ -36,9 +36,9 @@ function utils.show_error(pcall_err)
 	utils.api.nvim_bell()
 	utils.api.nvim_show_err(
 		globals.DEFAULT_ERROR_TITLE,
-		api.nvim_get_vvar('throwpoint')
+		vim.v.throwpoint
 		.. '\n' ..
-		api.nvim_get_vvar('exception')
+		vim.v.exception
 		.. '\n' ..
 		tostring(pcall_err)
 	)

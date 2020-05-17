@@ -2,9 +2,10 @@ local libmodal = require('libmodal')
 local fooModeRecurse = 1
 
 function fooMode()
-	local userInput = string.char(vim.api.nvim_get_var(
+
+	local userInput = string.char(vim.g[
 		'foo' .. tostring(fooModeRecurse) .. 'ModeInput'
-	))
+	])
 
 	if userInput == 'z' then
 		fooModeRecurse = fooModeRecurse + 1

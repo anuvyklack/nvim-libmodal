@@ -21,7 +21,8 @@ local api = vim.api
 ]]
 ------------------------
 function api.nvim_bell()
-	api.nvim_command('normal ' .. string.char(27)) -- escape char
+	-- make the user press escape.
+	api.nvim_feedkeys(string.char(globals.ESC_NR), 'nt', false)
 end
 
 ------------------------------------
@@ -34,7 +35,7 @@ end
 ]]
 ------------------------------------
 function api.nvim_exists(scope, var)
-	return api.nvim_call_function('exists', {scope .. ':' .. var}) == globals.VIM_TRUE
+	return globals.isTrue( vim.fn.exists(scope .. ':' .. var) )
 end
 
 -------------------------
@@ -62,7 +63,7 @@ end
 ]]
 -------------------------
 function api.nvim_input()
-	return api.nvim_call_function('getchar', {})
+	return vim.fn.getchar()
 end
 
 ---------------------------------
@@ -118,7 +119,7 @@ function api.nvim_show_err(title, msg)
 		HighlightSegment.new('Title', tostring(title) .. '\n'),
 		HighlightSegment.new('Error', tostring(msg)),
 	})
-	api.nvim_call_function('getchar', {})
+	vim.fn.getchar()
 end
 
 --[[

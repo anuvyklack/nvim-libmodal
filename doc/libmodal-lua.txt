@@ -415,8 +415,8 @@ FUNCTIONS                                     *libmodal-lua-globals-functions*
 		local trueValue      = true
 
 		-- Get Vim's `v:` truth values.
-		local v_falseValue   = vim.api.nvim_get_vvar('false')
-		local v_trueValue    = vim.api.nvim_get_vvar('true')
+		local v_falseValue   = vim.api.v.false
+		local v_trueValue    = vim.api.v.true
 
 		-- Get Vimscript's truth values.
 		local vim_falseValue = libmodal.globals.VIM_FALSE
@@ -455,8 +455,8 @@ FUNCTIONS                                     *libmodal-lua-globals-functions*
 		local trueValue      = true
 
 		-- Get Vim's `v:` truth values.
-		local v_falseValue   = vim.api.nvim_get_vvar('false')
-		local v_trueValue    = vim.api.nvim_get_vvar('true')
+		local v_falseValue   = vim.v.false
+		local v_trueValue    = vim.v.true
 
 		-- Get Vimscript's truth values.
 		local vim_falseValue = libmodal.globals.VIM_FALSE
@@ -718,13 +718,11 @@ Whenever a `Popup` is created, it is immediately opened. Additionally, it is
 opened with the following options: >
 	local _winOpenOpts = {
 		['anchor']    = 'SW',
-		['col']       = api.nvim_get_option('columns') - 1,
+		['col']       = vim.o.columns - 1,
 		['focusable'] = false,
 		['height']    = 1,
 		['relative']  = 'editor',
-		['row']       = api.nvim_get_option('lines')
-		                - api.nvim_get_option('cmdheight')
-		                - 1,
+		['row']       = vim.o.lines - vim.o.cmdheight - 1,
 		['style']     = 'minimal',
 		['width']     = 25,
 	}
@@ -906,10 +904,10 @@ FUNCTIONS                                         *libmodal-lua-api-functions*
 		local libmodal = require('libmodal')
 
 		-- Set a mock variable to 3.
-		libmodal.utils.api.nvim_set_var('foo', 3)
+		vim.g.foo = 3
 		print(libmodal.utils.api.nvim_exists('g', 'foo')) -- true
 
-		libmodal.utils.api.nvim_command('unlet g:foo')
+		vim.api.nvim_command('unlet g:foo')
 		print(libmodal.utils.api.nvim_exists('g', 'foo')) -- false
 <
 
@@ -967,8 +965,8 @@ FUNCTIONS                                         *libmodal-lua-api-functions*
 		local api = vim.api
 
 		-- Echo hello and prompt for input before continuing.
-		api.nvim_command("echo 'Hello!'")
-		api.nvim_call_function('getchar', {})
+		print("Hello!")
+		vim.fn.getchar()
 
 		-- Clear the screen.
 		libmodal.utils.api.nvim_redraw()
@@ -1106,11 +1104,11 @@ FUNCTIONS                                 *libmodal-lua-WindowState-functions*
 		local windowState = libmodal.utils.WindowState.new()
 
 		-- Set the 'winheight' to a new value.
-		api.nvim_set_option('winheight', 100)
+		vim.o.winheight = 100
 
 		-- Define a function to print the 'winheight' value.
 		local print_height = function()
-			api.nvim_command('echo &winheight')
+			print(vim.o.winheight)
 		end
 
 		-- Print the 'winheight' prior to `restore()`.

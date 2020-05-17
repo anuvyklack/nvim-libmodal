@@ -270,7 +270,7 @@ Using a callback `function`: >
 
 	function fooMode()
 		fooModeInputHistory[#fooModeInputHistory + 1] = string.char(
-			api.nvim_get_var('fooModeInput')
+			vim.g.fooModeInput
 		)
 
 		local index = 1
@@ -316,18 +316,16 @@ Using a callback `function`: >
 	local libmodal = require('libmodal')
 
 	function fooMode()
-		local userInput = string.char(
-			vim.api.nvim_get_var('fooModeInput')
-		)
+		local userInput = string.char(vim.g.fooModeInput)
 
 		if userInput == '' then
-			vim.api.nvim_command("echom 'You cant leave using <Esc>.'")
+			print('You cant leave using <Esc>.')
 		elseif userInput == 'q' then
-			vim.api.nvim_set_var('fooModeExit', true)
+			vim.g.fooModeExit = true
 		end
 	end
 
-	vim.api.nvim_set_var('fooModeExit', 0)
+	vim.g.fooModeExit = false
 	libmodal.mode.enter('FOO', fooMode, true)
 <
 
@@ -345,10 +343,10 @@ Using a |key-mapping| `table`: >
 	local libmodal = require('libmodal')
 	local fooModeCombos = {
 		[''] = 'echom "You cant exit using escape."',
-		['q'] = 'let g:fooModeExit = 1'
+		['q'] = 'let g:fooModeExit = v:true'
 	}
 
-	vim.api.nvim_set_var('fooModeExit', 0)
+	vim.g.fooModeExit = false
 	libmodal.mode.enter('FOO', fooModeCombos, true)
 <
 
@@ -360,9 +358,9 @@ Using a callback `function`: >
 	local fooModeRecurse = 0
 
 	function fooMode()
-		local userInput = string.char(vim.api.nvim_get_var(
+		local userInput = string.char(vim.g[
 			'foo' .. tostring(fooModeRecurse) .. 'ModeInput'
-		))
+		])
 
 		if userInput == 'z' then
 			fooModeRecurse = fooModeRecurse + 1
@@ -420,7 +418,7 @@ Using a callback `function`: >
 	local commandList = {'new', 'close', 'last'}
 
 	function fooMode()
-		local userInput = vim.api.nvim_get_var('fooModeInput')
+		local userInput = vim.g.fooModeInput
 		if userInput == 'new' then
 			api.nvim_command('tabnew')
 		elseif userInput == 'close' then
@@ -489,20 +487,20 @@ To enable 'timeout's, one may set the following |variables|:
 	Lua: ~
 >
 	" Set libmodal modes to turn timeouts on.
-	vim.api.nvim_set_var('libmodalTimeouts', true)
+	vim.g.libmodalTimeouts = true
 	" Enable timeouts for specific mode.
-	vim.api.nvim_set_var('{name}ModeTimeouts', true)
+	vim.g['{name}ModeTimeouts'] = true
 <
 	Vimscript: ~
 >
 	" Set libmodal modes to turn timeouts on.
-	let g:libmodalTimeouts = 1
+	let g:libmodalTimeouts = v:true
 	" Enable timeouts for specific mode.
-	let g:{name}ModeTimeouts = 1
+	let g:{name}ModeTimeouts = v:true
 <
 
 
-Similarly, to disable them, one may set them to `0`.
+Similarly, to disable them, one may set them to `0` or |v:false|.
 
 When `g:libmodalTimeouts` or `g:{name}ModeTimeouts` is set to `1`, |libmodal|
 will automatically execute commands that have mappings that might also be
@@ -548,13 +546,13 @@ then reset it upon exit. Example:
 
 		function fooMode()
 			-- Get the user's preferred timeout length.
-			local prevTimeoutLen = api.nvim_get_option('timeoutlen')
+			local prevTimeoutLen = vim.o.timeoutlen
 			-- Set it to something else, like 1500ms.
-			api.nvim_set_option('timeoutlen', 1500)
+			vim.o.timeoutlen = 1500
 			-- Enter a mode.
 			libmodal.mode.enter(…)
 			-- Restore the `timeoutlen`
-			api.nvim_set_option('timeoutlen', prevTimeoutLen)
+			vim.o.timeoutlen = prevTimeoutLen
 		end
 <
 

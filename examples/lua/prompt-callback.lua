@@ -3,7 +3,7 @@ local api = vim.api
 local commandList = {'new', 'close', 'last'}
 
 function fooMode()
-	local userInput = vim.api.nvim_get_var('fooModeInput')
+	local userInput = vim.g.fooModeInput
 	if userInput == 'new' then
 		api.nvim_command('tabnew')
 	elseif userInput == 'close' then

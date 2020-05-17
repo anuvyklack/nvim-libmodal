@@ -1,14 +1,3 @@
-let s:winOpenOpts = {
-\	'anchor'   : 'SW',
-\	'col'      : &columns - 1,
-\	'focusable': v:false,
-\	'height'   : 1,
-\	'relative' : 'editor',
-\	'row'      : &lines - &cmdheight - 1,
-\	'style'    : 'minimal',
-\	'width'    : 25,
-\}
-
 " SUMMARY:
 " * Get user input with some `completions`.
 " PARAMS:

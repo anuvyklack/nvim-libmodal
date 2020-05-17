@@ -4,5 +4,5 @@ local fooModeCombos = {
 	['q'] = 'let g:fooModeExit = 1'
 }
 
-vim.api.nvim_set_var('fooModeExit', 0)
+vim.g.fooModeExit = 0
 libmodal.mode.enter('FOO', fooModeCombos, true)
