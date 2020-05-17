@@ -57,7 +57,7 @@ end
 		'"endwhile"'
 	}
 
-	return tonumber(vim.api.nvim_call_function("execute",cmd))
+	return tonumber(vim.fn.execute(cmd))
 	```
 	However, I'm not sure if it would accidentally affect text.
 ]]
