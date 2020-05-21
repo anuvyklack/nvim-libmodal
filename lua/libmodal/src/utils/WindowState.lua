@@ -32,8 +32,8 @@ local _metaWindowState = classes.new({})
 ]]
 -----------------------------------
 function _metaWindowState:restore()
-	api.nvim_set_option(height, self.height)
-	api.nvim_set_option(width, self.width)
+	vim.o.height = self.height
+	vim.o.width  = self.width
 	api.nvim_redraw()
 end
 
@@ -54,8 +54,8 @@ end
 function WindowState.new()
 	return setmetatable(
 		{
-			['height'] = api.nvim_get_option(height),
-			['width']  = api.nvim_get_option(width),
+			['height'] = vim.o.height,
+			['width']  = vim.o.width,
 		},
 		_metaWindowState
 	)

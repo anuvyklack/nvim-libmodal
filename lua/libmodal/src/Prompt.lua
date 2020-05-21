@@ -56,11 +56,11 @@ function _metaPrompt:_inputLoop()
 	-- set the user input variable
 	if self._completions
 	then userInput =
-		api.nvim_call_function('libmodal#_inputWith', {
-			self.indicator.str, self._completions
-		})
+		vim.fn['libmodal#_inputWith'](
+			self._indicator.str, self._completions
+		)
 	else userInput =
-		api.nvim_call_function('input', {self.indicator})
+		vim.fn.input(self.indicator)
 	end
 
 	-- get the instruction for the mode.

@@ -26,7 +26,7 @@ Mode.Popup      = require('libmodal/src/Mode/Popup')
 local _HELP = '?'
 local _TIMEOUT = {
 	['CHAR'] = 'ø',
-	['LEN']  = api.nvim_get_option('timeoutlen'),
+	['LEN']  = vim.o.timeoutlen,
 	['SEND'] = function(__self)
 		api.nvim_feedkeys(__self.CHAR, '', false)
 	end

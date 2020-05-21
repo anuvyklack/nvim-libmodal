@@ -17,7 +17,7 @@ local globals = require('libmodal/src/globals')
 local _TIMEOUT_GLOBAL_NAME = 'libmodalTimeouts'
 
 local Vars = {
-	[_TIMEOUT_GLOBAL_NAME] = api.nvim_get_var(_TIMEOUT_GLOBAL_NAME)
+	[_TIMEOUT_GLOBAL_NAME] = vim.g[_TIMEOUT_GLOBAL_NAME]
 }
 
 --[[
@@ -53,7 +53,7 @@ end
 ]]
 ------------------------------------
 function _metaVars:nvimGet()
-	return api.nvim_get_var(self:name())
+	return vim.g[self:name()]
 end
 
 -----------------------------------------
@@ -66,7 +66,7 @@ end
 ]]
 -----------------------------------------
 function _metaVars:nvimSet(val)
-	api.nvim_set_var(self:name(), val)
+	vim.g[self:name()] = val
 end
 
 --[[
