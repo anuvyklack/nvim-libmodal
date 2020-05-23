@@ -35,7 +35,7 @@ end
 ]]
 ------------------------------------
 function api.nvim_exists(scope, var)
-	return globals.isTrue( vim.fn.exists(scope .. ':' .. var) )
+	return globals.is_true( vim.fn.exists(scope .. ':' .. var) )
 end
 
 -------------------------

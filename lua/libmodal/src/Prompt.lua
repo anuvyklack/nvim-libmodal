@@ -57,7 +57,7 @@ function _metaPrompt:_inputLoop()
 	if self._completions
 	then userInput =
 		vim.fn['libmodal#_inputWith'](
-			self._indicator.str, self._completions
+			self.indicator.str, self._completions
 		)
 	else userInput =
 		vim.fn.input(self.indicator)
