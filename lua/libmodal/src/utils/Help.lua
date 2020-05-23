@@ -23,7 +23,7 @@ function _metaHelp:show()
 	for _, helpText in ipairs(self) do
 		print(helpText)
 	end
-	vim.api.nvim_call_function('getchar', {})
+	vim.fn.getchar()
 end
 
 --[[
