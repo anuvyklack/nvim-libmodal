@@ -1161,7 +1161,7 @@ FUNCTIONS                                       *libmodal-lua-Vars.functions*
 		local libmodal = require('libmodal')
 
 		local input = libmodal.Vars('input', 'FOO')
-		vim.api.nvim_set_var(input:name(), 'test')
+		vim.g[input:name()] = 'test'
 		print(input:nvimGet())
 <
 
