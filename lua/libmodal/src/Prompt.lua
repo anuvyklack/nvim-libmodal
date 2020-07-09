@@ -4,11 +4,8 @@
 	 */
 --]]
 
-local classes   = require('libmodal/src/classes')
 local globals   = require('libmodal/src/globals')
-local Indicator = require('libmodal/src/Indicator')
 local utils     = require('libmodal/src/utils')
-local Vars      = require('libmodal/src/Vars')
 
 local api  = utils.api
 
@@ -18,7 +15,7 @@ local api  = utils.api
 	 */
 --]]
 
-local Prompt = {}
+local Prompt = {['TYPE'] = 'libmodal-prompt'}
 
 local _HELP = 'help'
 local _REPLACEMENTS = {
@@ -36,7 +33,7 @@ end
 	 */
 --]]
 
-local _metaPrompt = classes.new({})
+local _metaPrompt = require('libmodal/src/classes').new(Prompt.TYPE)
 
 ---------------------------------
 --[[ SUMMARY:
@@ -101,7 +98,7 @@ function _metaPrompt:enter()
 		-- if there were errors.
 		if not noErrors then
 			utils.show_error(promptResult)
-			continueMode = false
+			continueMode = true
 		else
 			continueMode = promptResult
 		end
@@ -130,7 +127,7 @@ end
 ]]
 ------------------------------------------------------
 function Prompt.createCompletionsProvider(completions)
-	return function(argLead, cmdLine, cursorPos)
+	return function(argLead, cmdLine, _)
 		if string.len(cmdLine) < 1 then return completions
 		end
 
@@ -176,10 +173,12 @@ end
 ]]
 -------------------------------------------
 function Prompt.new(name, instruction, ...)
+	name = vim.trim(name)
+
 	local self = setmetatable(
 		{
-			['indicator']   = Indicator.prompt(name),
-			['input']       = Vars.new('input', name),
+			['indicator']    = require('libmodal/src/Indicator').prompt(name),
+			['input']        = require('libmodal/src/Vars').new('input', name),
 			['_instruction'] = instruction,
 			['_name']        = name
 		},

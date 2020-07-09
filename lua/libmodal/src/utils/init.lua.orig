@@ -24,13 +24,25 @@ utils.WindowState = require('libmodal/src/utils/WindowState')
 ]]
 ----------------------------------
 function utils.show_error(pcall_err)
+<<<<<<< HEAD
+	utils.api.nvim_bell()
+	utils.api.nvim_show_err(
+		globals.DEFAULT_ERROR_TITLE,
+		vim.v.throwpoint
+||||||| 1501358
+	utils.api.nvim_bell()
+	utils.api.nvim_show_err(
+		globals.DEFAULT_ERROR_TITLE,
+		api.nvim_get_vvar('throwpoint')
+=======
 	local api = utils.api
 
 	api.nvim_bell()
 
 	api.nvim_show_err(
 		require('libmodal/src/globals').DEFAULT_ERROR_TITLE,
-		vim.v.throwpoint
+		api.nvim_get_vvar('throwpoint')
+>>>>>>> master
 		.. '\n' ..
 		vim.v.exception
 		.. '\n' ..

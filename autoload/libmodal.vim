@@ -51,7 +51,7 @@ function! libmodal#_lua(lib, args)
 	\	[
 	\		a:args[0],
 	\		a:args[1],
-	\		len(a:args) > 2 ? a:args[2] : v:false
+	\		get(a:args, 2, v:null)
 	\	]
 	\)
 endfunction

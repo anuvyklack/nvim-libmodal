@@ -1,7 +1,10 @@
+local api = vim.api
 local libmodal = require('libmodal')
 
 local function fooMode()
-	local userInput = string.char(vim.g.fooModeInput)
+	local userInput = string.char(
+		api.nvim_get_var('fooModeInput')
+	)
 
 	if userInput == '' then
 		print('You cant leave using <Esc>.')

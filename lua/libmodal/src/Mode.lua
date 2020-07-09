@@ -4,14 +4,13 @@
 	 */
 --]]
 
-local classes     = require('libmodal/src/classes')
-local globals     = require('libmodal/src/globals')
-local Indicator   = require('libmodal/src/Indicator')
-local collections = require('libmodal/src/collections')
-local utils       = require('libmodal/src/utils')
-local Vars        = require('libmodal/src/Vars')
+local classes    = require('libmodal/src/classes')
+local globals    = require('libmodal/src/globals')
+local ParseTable = require('libmodal/src/collections/ParseTable')
+local utils      = require('libmodal/src/utils')
+local Vars       = require('libmodal/src/Vars')
 
-local api  = utils.api
+local api = utils.api
 
 --[[
 	/*
@@ -19,16 +18,14 @@ local api  = utils.api
 	 */
 --]]
 
-local Mode = {}
-
-Mode.Popup      = require('libmodal/src/Mode/Popup')
+local Mode = {['TYPE']  = 'libmodal-mode'}
 
 local _HELP = '?'
 local _TIMEOUT = {
 	['CHAR'] = 'ø',
 	['LEN']  = vim.o.timeoutlen,
 	['SEND'] = function(__self)
-		api.nvim_feedkeys(__self.CHAR, '', false)
+		api.nvim_feedkeys(__self.CHAR, 'nt', false)
 	end
 }
 _TIMEOUT.NR = string.byte(_TIMEOUT.CHAR)
@@ -39,15 +36,17 @@ _TIMEOUT.NR = string.byte(_TIMEOUT.CHAR)
 	 */
 --]]
 
-local _metaMode = classes.new({})
+local _metaMode = classes.new(Mode.TYPE)
 
-local _metaInputBytes = classes.new({
+local _metaInputBytes = classes.new(nil, {
 	['clear'] = function(__self)
 		for i, _ in ipairs(__self) do
 			__self[i] = nil
 		end
 	end
 })
+
+classes = nil
 
 -----------------------------------------------
 --[[ SUMMARY:
@@ -64,21 +63,20 @@ function _metaMode:_checkInputForMapping()
 	inputBytes[#inputBytes + 1] = self.input:nvimGet()
 
 	-- Get the command based on the users input.
-	local cmd = self.mappings:parseGet(inputBytes)
+	local cmd = self.mappings:get(inputBytes)
 
 	-- Get the type of the command.
 	local commandType = type(cmd)
-	local clearInputBytes = false
 
 	-- if there was no matching command
-	if cmd == false then
+	if not cmd then
 		if #inputBytes < 2 and inputBytes[1] == string.byte(_HELP) then
 			self._help:show()
 		end
 		inputBytes:clear()
 	-- The command was a table, meaning that it MIGHT match.
 	elseif commandType == globals.TYPE_TBL
-	       and globals.is_true(self._timeouts.enabled)
+		and globals.is_true(self._timeouts.enabled)
 	then
 		-- Create a new timer
 
@@ -88,8 +86,8 @@ function _metaMode:_checkInputForMapping()
 				-- Send input to interrupt a blocking `getchar`
 				_TIMEOUT:SEND()
 				-- if there is a command, execute it.
-				if cmd[collections.ParseTable.CR] then
-					api.nvim_command(cmd[collections.ParseTable.CR])
+				if cmd[ParseTable.CR] then
+					api.nvim_command(cmd[ParseTable.CR])
 				end
 				-- clear input
 				inputBytes:clear()
@@ -115,7 +113,7 @@ function _metaMode:enter()
 	-- intialize variables that are needed for each recurse of a function
 	if type(self._instruction) == globals.TYPE_TBL then
 		-- Initialize the input history variable.
-		self._popups:push(Mode.Popup.new())
+		self._popups:push(require('libmodal/src/collections/Popup').new())
 	end
 
 
@@ -128,7 +126,7 @@ function _metaMode:enter()
 		-- If there were errors, handle them.
 		if not noErrors then
 			utils.show_error(modeResult)
-			continueMode = false
+			continueMode = true
 		else
 			continueMode = modeResult
 		end
@@ -154,10 +152,10 @@ function _metaMode:_initMappings()
 	self.inputBytes = setmetatable({}, _metaInputBytes)
 
 	-- Build the parse tree.
-	self.mappings = collections.ParseTable.new(self._instruction)
+	self.mappings = ParseTable.new(self._instruction)
 
 	-- Create a table for mode-specific data.
-	self._popups = collections.Stack.new()
+	self._popups = require('libmodal/src/collections/Stack').new()
 
 	-- Create a variable for whether or not timeouts are enabled.
 	self._timeouts = Vars.new('timeouts', self._name)
@@ -248,11 +246,13 @@ end
 ]]
 -----------------------------------------
 function Mode.new(name, instruction, ...)
+	name = vim.trim(name)
+
 	-- Inherit the metatable.
 	local self = setmetatable(
 		{
 			['exit']         = Vars.new('exit', name),
-			['indicator']    = Indicator.mode(name),
+			['indicator']    = require('libmodal/src/Indicator').mode(name),
 			['input']        = Vars.new('input', name),
 			['_instruction'] = instruction,
 			['_name']        = name,

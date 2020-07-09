@@ -11,7 +11,7 @@ function _inputHistory:clear(indexToCheck)
 	end
 end
 
-function fooMode()
+local function fooMode()
 	_inputHistory[#_inputHistory + 1] = string.char(
 		vim.g.fooModeInput
 	)

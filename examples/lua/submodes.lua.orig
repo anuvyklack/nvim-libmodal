@@ -1,8 +1,17 @@
 local libmodal = require('libmodal')
 local fooModeRecurse = 1
 
-function FooMode()
+<<<<<<< HEAD
+function fooMode()
+
 	local userInput = string.char(vim.g[
+||||||| 1501358
+function fooMode()
+	local userInput = string.char(vim.api.nvim_get_var(
+=======
+function FooMode()
+	local userInput = string.char(vim.api.nvim_get_var(
+>>>>>>> master
 		'foo' .. tostring(fooModeRecurse) .. 'ModeInput'
 	])
 

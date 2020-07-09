@@ -1,0 +1,45 @@
+local api = vim.api
+local libmodal = require('libmodal')
+
+<<<<<<< HEAD
+local function fooMode()
+	local userInput = string.char(vim.g.fooModeInput)
+||||||| 1501358
+function fooMode()
+	local userInput = string.char(
+		vim.api.nvim_get_var('fooModeInput')
+	)
+=======
+local function fooMode()
+	local userInput = string.char(
+		api.nvim_get_var('fooModeInput')
+	)
+>>>>>>> master
+
+	if userInput == '' then
+<<<<<<< HEAD
+		print('You cant leave using <Esc>.')
+||||||| 1501358
+		vim.api.nvim_command("echom 'You cant leave using <Esc>.'")
+=======
+		api.nvim_command("echom 'You cant leave using <Esc>.'")
+>>>>>>> master
+	elseif userInput == 'q' then
+<<<<<<< HEAD
+		vim.g.fooModeExit = true
+||||||| 1501358
+		vim.api.nvim_set_var('fooModeExit', true)
+=======
+		api.nvim_set_var('fooModeExit', true)
+>>>>>>> master
+	end
+end
+
+<<<<<<< HEAD
+vim.g.fooModeExit = false
+||||||| 1501358
+vim.api.nvim_set_var('fooModeExit', 0)
+=======
+api.nvim_set_var('fooModeExit', 0)
+>>>>>>> master
+libmodal.mode.enter('FOO', fooMode, true)

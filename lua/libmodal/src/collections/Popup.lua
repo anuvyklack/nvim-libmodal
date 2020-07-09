@@ -4,8 +4,7 @@
 	 */
 --]]
 
-local api        = vim.api
-local classes = require('libmodal/src/classes')
+local api = vim.api
 
 --[[
 	/*
@@ -13,17 +12,18 @@ local classes = require('libmodal/src/classes')
 	 */
 --]]
 
-local Popup = {}
-
-local _winOpenOpts = {
-	['anchor']    = 'SW',
-	['col']       = vim.o.columns - 1,
-	['focusable'] = false,
-	['height']    = 1,
-	['relative']  = 'editor',
-	['row']       = vim.o.lines - vim.o.cmdheight - 1,
-	['style']     = 'minimal',
-	['width']     = 25,
+local Popup = {
+	['TYPE'] = 'libmodal-popup',
+	['config'] = {
+		['anchor']    = 'SW',
+		['col']       = vim.o.columns - 1,
+		['focusable'] = false,
+		['height']    = 1,
+		['relative']  = 'editor',
+		['row']       = vim.o.lines - vim.o.cmdheight - 1,
+		['style']     = 'minimal',
+		['width']     = 25
+	}
 }
 
 --[[
@@ -32,27 +32,27 @@ local _winOpenOpts = {
 	 */
 --]]
 
-local _metaPopup = classes.new({})
+local _metaPopup = require('libmodal/src/classes').new(Popup.TYPE)
 
 ---------------------------
 --[[ SUMMARY:
-	* Close `self._window`
+	* Close `self.window`
 	* The `self` is inert after calling this.
 ]]
 ---------------------------
 function _metaPopup:close()
-	api.nvim_win_close(self._window, false)
+	api.nvim_win_close(self.window, false)
 
-	self._buffer     = nil
+	self.buffer     = nil
 	self._inputChars = nil
-	self._window      = nil
+	self.window      = nil
 end
 
----------------------------------
+---------------------------------------
 --[[ SUMMARY:
 	* Update `buffer` with the latest user `inputBytes`.
 ]]
----------------------------------
+---------------------------------------
 function _metaPopup:refresh(inputBytes)
 	local inputBytesLen = #inputBytes
 	local inputChars    = self._inputChars
@@ -71,7 +71,7 @@ function _metaPopup:refresh(inputBytes)
 	end
 
 	api.nvim_buf_set_lines(
-		self._buffer, 0, 1, true,
+		self.buffer, 0, 1, true,
 		{table.concat(self._inputChars)}
 	)
 end
@@ -87,9 +87,9 @@ function Popup.new()
 
 	return setmetatable(
 		{
-			['_buffer']     = buf,
+			['buffer']      = buf,
 			['_inputChars'] = {},
-			['_window']      = api.nvim_open_win(buf, false, _winOpenOpts)
+			['_window']     = api.nvim_open_win(buf, false, _winOpenOpts)
 		},
 		_metaPopup
 	)

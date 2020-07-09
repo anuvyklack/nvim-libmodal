@@ -12,7 +12,8 @@ local api = vim.api
 ]]
 ------------------------
 function api.nvim_bell()
-	vim.cmd('normal ' .. string.char(27)) -- escape char
+	-- make the user press escape.
+	api.nvim_feedkeys(string.char(globals.ESC_NR), 'nt', false)
 end
 
 ------------------------------------
@@ -25,7 +26,13 @@ end
 ]]
 ------------------------------------
 function api.nvim_exists(scope, var)
-	return vim.fn.exists(scope..':'..var) == require('libmodal/src/globals').VIM_TRUE
+<<<<<<< HEAD
+	return globals.is_true( vim.fn.exists(scope .. ':' .. var) )
+||||||| 1501358
+	return api.nvim_call_function('exists', {scope .. ':' .. var}) == globals.VIM_TRUE
+=======
+	return api.nvim_call_function('exists', {scope .. ':' .. var}) == require('libmodal/src/globals').VIM_TRUE
+>>>>>>> master
 end
 
 -------------------------
@@ -47,7 +54,7 @@ end
 		'"endwhile"'
 	}
 
-	return tonumber(vim.cmd(cmd))
+	return tonumber(vim.fn.execute(cmd))
 	```
 	However, I'm not sure if it would accidentally affect text.
 ]]
@@ -79,9 +86,9 @@ function api.nvim_lecho(hlTables)
 		lecho_template[2] = tostring(hlTable.hl)
 		lecho_template[4] = tostring(hlTable.str)
 
-		vim.cmd(table.concat(lecho_template))
+		api.nvim_command(table.concat(lecho_template))
 	end
-	vim.cmd('echohl None')
+	api.nvim_command('echohl None')
 end
 
 --------------------------
@@ -91,7 +98,7 @@ end
 ]]
 --------------------------
 function api.nvim_redraw()
-	vim.cmd('mode')
+	api.nvim_command('mode')
 end
 
 --------------------------------------

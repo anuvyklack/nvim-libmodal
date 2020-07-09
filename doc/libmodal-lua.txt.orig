@@ -600,8 +600,8 @@ FUNCTIONS                                     *libmodal-lua-globals-functions*
 		local trueValue      = true
 
 		-- Get Vim's `v:` truth values.
-		local v_falseValue   = vim.v.false
-		local v_trueValue    = vim.v.true
+		local v_falseValue   = vim.api.v.false
+		local v_trueValue    = vim.api.v.true
 
 		-- Get Vimscript's truth values.
 		local vim_falseValue = libmodal.globals.VIM_FALSE
@@ -640,8 +640,8 @@ FUNCTIONS                                     *libmodal-lua-globals-functions*
 		local trueValue      = true
 
 		-- Get Vim's `v:` truth values.
-		local v_falseValue   = vim.false
-		local v_trueValue    = vim.true
+		local v_falseValue   = vim.v.false
+		local v_trueValue    = vim.v.true
 
 		-- Get Vimscript's truth values.
 		local vim_falseValue = libmodal.globals.VIM_FALSE
@@ -1060,7 +1060,121 @@ FUNCTIONS                                        *libmodal-lua-Mode-functions*
 		                 the same.
 
 ==============================================================================
+<<<<<<< HEAD
+6.1. `libmodal.Mode.Popup`                                  *libmodal-lua-Popup*
+
+When `:enter()`ing a `Mode`, an |api-floatwin| is displayed at the bottom
+right-hand corner of the screen. `libmodal.Mode.Popup` is responsible for
+opening it and keeping updated.
+
+Whenever a `Popup` is created, it is immediately opened. Additionally, it is
+opened with the following options: >
+	local _winOpenOpts = {
+		['anchor']    = 'SW',
+		['col']       = vim.o.columns - 1,
+		['focusable'] = false,
+		['height']    = 1,
+		['relative']  = 'editor',
+		['row']       = vim.o.lines - vim.o.cmdheight - 1,
+		['style']     = 'minimal',
+		['width']     = 25,
+	}
+<
+
+------------------------------------------------------------------------------
+FUNCTIONS                                       *libmodal-lua-Popup-functions*
+
+`self`:close()                                      *libmodal-lua-Popup.close()*
+
+	Close the window that this `Popup` represents.
+
+	Note: All variables of `Popup` are de-initialized after this method.
+
+`self`:refresh({inputBytes})                      *libmodal-lua-Popup.refresh()*
+
+	Update the content of the `Popup` using an array-like `table` of
+	|char2nr|s.
+
+	Note: This is normally used to add what the user is typing. If you have a
+	      `function` `Mode` {instruction}, then you can use `Popup` and this
+		  function to manually show user input as it is typed.
+
+	Parameters: ~
+		{inputBytes}  An array-like `table` of |char2nr|s to write to the
+		              `Popup`.
+
+`Popup`.new()                                         *libmodal-lua-Popup.new()*
+
+	Create a new `Popup` and immediately open it.
+
+	Return: ~
+		* A new `Popup`.
+
+	See also: ~
+		|libmodal-lua-Popup|  For the options used to spawn the window.
+
+==============================================================================
+7. `libmodal.Prompt`                                       *libmodal-lua-Prompt*
+||||||| 1501358
+6.1. `libmodal.Mode.Popup`                                  *libmodal-lua-Popup*
+
+When `:enter()`ing a `Mode`, an |api-floatwin| is displayed at the bottom
+right-hand corner of the screen. `libmodal.Mode.Popup` is responsible for
+opening it and keeping updated.
+
+Whenever a `Popup` is created, it is immediately opened. Additionally, it is
+opened with the following options: >
+	local _winOpenOpts = {
+		['anchor']    = 'SW',
+		['col']       = api.nvim_get_option('columns') - 1,
+		['focusable'] = false,
+		['height']    = 1,
+		['relative']  = 'editor',
+		['row']       = api.nvim_get_option('lines')
+		                - api.nvim_get_option('cmdheight')
+		                - 1,
+		['style']     = 'minimal',
+		['width']     = 25,
+	}
+<
+
+------------------------------------------------------------------------------
+FUNCTIONS                                       *libmodal-lua-Popup-functions*
+
+`self`:close()                                      *libmodal-lua-Popup.close()*
+
+	Close the window that this `Popup` represents.
+
+	Note: All variables of `Popup` are de-initialized after this method.
+
+`self`:refresh({inputBytes})                      *libmodal-lua-Popup.refresh()*
+
+	Update the content of the `Popup` using an array-like `table` of
+	|char2nr|s.
+
+	Note: This is normally used to add what the user is typing. If you have a
+	      `function` `Mode` {instruction}, then you can use `Popup` and this
+		  function to manually show user input as it is typed.
+
+	Parameters: ~
+		{inputBytes}  An array-like `table` of |char2nr|s to write to the
+		              `Popup`.
+
+`Popup`.new()                                         *libmodal-lua-Popup.new()*
+
+	Create a new `Popup` and immediately open it.
+
+	Return: ~
+		* A new `Popup`.
+
+	See also: ~
+		|libmodal-lua-Popup|  For the options used to spawn the window.
+
+==============================================================================
+7. `libmodal.Prompt`                                       *libmodal-lua-Prompt*
+=======
 8. `libmodal.Prompt`                                       *libmodal-lua-Prompt*
+>>>>>>> master
 
 While `libmodal.prompt.enter()` may enter a |libmodal-prompt|, itilently
 creates a `Mode` underneath: >
@@ -1205,7 +1319,7 @@ FUNCTIONS                                         *libmodal-lua-api-functions*
 		vim.g.foo = 3
 		print(libmodal.utils.api.nvim_exists('g', 'foo')) -- true
 
-		vim.cmd('unlet g:foo')
+		vim.api.nvim_command('unlet g:foo')
 		print(libmodal.utils.api.nvim_exists('g', 'foo')) -- false
 <
 
@@ -1263,7 +1377,7 @@ FUNCTIONS                                         *libmodal-lua-api-functions*
 		local api = vim.api
 
 		-- Echo hello and prompt for input before continuing.
-		print('Hello!')
+		print("Hello!")
 		vim.fn.getchar()
 
 		-- Clear the screen.

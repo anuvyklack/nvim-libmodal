@@ -95,7 +95,7 @@ See: |api|, |lua-api|, https://github.com/Iron-E/nvim-tabmode,
 ------------------------------------------------------------------------------
 FUNCTIONS                                           *libmodal-usage-functions*
 
-                    *libmodal-mode* *libmodal#Enter()* *libmodal.mode.enter()*
+                        *libmodal-mode* *libmodal#Enter()* *libmodal.mode.enter()*
 `libmodal.mode`.enter({name}, {instruction} [, {supressExit}])
 `libmodal`#Enter({name}, {instruction} [, {supressExit}])
 
@@ -171,11 +171,45 @@ FUNCTIONS                                           *libmodal-usage-functions*
 			  desired. See |libmodal-examples-supress-exit|.
 
 	See also: ~
-		|lua-eval|                For type conversions between Vimscript to |Lua|.
+		|lua-eval|                For type conversions between Vimscript to
+		                        |Lua|.
 		|libmodal-examples-mode|  For examples of this function.
 
 
-              *libmodal-prompt* *libmodal#Prompt()*  *libmodal.prompt.enter()*
+`libmodal.layer`.enter({keymap})         *libmodal-layer* *libmodal.layer.enter()*
+
+	While a |libmodal-mode| ignores behavior that has not been explicitly
+	defined, a |libmodal-layer| allows unrecognized |input| to be passed back
+	into Neovim for analysis.
+
+	So, if you have only defined a few keybindings, all of the remaining ones
+	from a user's configuration would still work— only new keymaps will be
+	overwritten.
+
+	Parameters: ~
+		{keymap}  The keymap for the layer. General template is this: >
+			{
+				[<mode>] = {
+					[<lhs>] = {
+						['rhs'] = <rhs>,
+						<opts>
+					},
+					…
+				},
+				…
+			}
+<			Where {mode}, {lhs}, {rhs}, and {opts} are the same as in
+			|nvim_set_keymap()|
+
+
+	Return: ~
+		* The `function` used to undo changes made by the layer.
+
+	See also: ~
+		|libmodal-examples-layers|  For an example.
+		|nvim_set_keymap()|         For more information about {keymap}.
+
+                  *libmodal-prompt* *libmodal#Prompt()*  *libmodal.prompt.enter()*
 `libmodal.prompt`.enter({name}, {instruction} [, {completions}])
 `libmodal`#Prompt({name}, {instruction} [, {completions}])
 
@@ -255,7 +289,7 @@ all be tested using the |luafile| |command|.
 See: |libmodal-usage|, |libmodal-use-case|, |lua-require-example|.
 
 ------------------------------------------------------------------------------
-MODES                                                 *libmodal-examples-mode*
+MODES                                                *libmodal-examples-modes*
 
 Using a callback `function`: >
 	local api = vim.api
@@ -410,7 +444,31 @@ Using a |key-mapping| `table`: >
 <
 
 ------------------------------------------------------------------------------
-PROMPTS                                             *libmodal-examples-prompt*
+LAYERS                                              *libmodal-examples-layers*
+>
+	local libmodal = require('libmodal')
+
+	-- save the exit function
+	local exitFunc = libmodal.layer.enter({
+		['n'] = { -- normal mode
+			['gg'] = { -- remap `gg`
+				['rhs'] = 'G', -- map it to `G`
+				['noremap'] = true -- don't remap
+			},
+			['G'] = { -- remap `G`
+				['rhs'] = 'gg', -- map it to `gg`
+				['noremap'] = true -- don't remap
+			}
+		}
+	})
+
+	-- exit the mode in five seconds
+	vim.loop.new_timer():start(5000, 0,
+		vim.schedule_wrap(exitFunc)
+	)
+<
+------------------------------------------------------------------------------
+PROMPTS                                            *libmodal-examples-prompts*
 
 Using a callback `function`: >
 	local libmodal = require('libmodal')
@@ -654,6 +712,38 @@ When submitting an issue, please describe the following:
 
 ==============================================================================
 8. Changelog                                              *libmodal-changelog*
+
+0.6.1 ~
+
+	Fixes: ~
+	* Mode names with spaces or underscores are now represented correctly
+	  by |libmodal-lua-Vars.name()|.
+
+0.6.0 ~
+
+	Additions: ~
+	* New module: |libmodal-layer|s.
+		* Allows for use of built-in modes with overwriting of keymaps.
+		* New class `libmodal.Layer`.
+		* New function `libmodal.layer.enter()`.
+	* New examples for new additions.
+	* `libmodal.collections.ParseTable`:
+		* Added new `:parseGet()` method to replace the `:get()`
+		  implementation.
+		*
+	* Added new `libmodal.collections.ParseTable.parse()` method.
+		* You can override it to change how the `ParseTable` parses its keys.
+	* Added `ParseTable.stringSplit()`.
+
+	Breaking Changes: ~
+	* Moved `libmodal.Mode.Popup` to `libmodal.collections.Popup`.
+	* Changed `libmodal.collections.ParseTable.parseGet()` back to
+	  `libmodal.collections.ParseTable.get()`.
+	  * `:get()` requires that keys have been parsed according to
+	    `.parse()`.
+
+	Changes: ~
+	* Exposed more functionality of `libmodal.collections.Popup`.
 
 0.5.0 ~
 
