@@ -359,24 +359,24 @@ Using a callback `function`: >
 <
 
 using a |key-mapping| `dict`: >
-	let s:barModeCombos = {
+	let s:barModeKeymaps = {
 	\	'zf': 'split',
 	\	'zfo': 'vsplit',
 	\	'zfc': 'tabnew'
 	\}
 
-	call libmodal#Enter('BAR', s:barModeCombos)
+	call libmodal#Enter('BAR', s:barModeKeymaps)
 <
 
 Using a |key-mapping| `table`: >
 	local libmodal = require('libmodal')
-	local fooModeCombos = {
+	local fooModeKeymaps = {
 		zf = 'split',
 		zfo = 'vsplit',
 		zfc = 'tabnew'
 	}
 
-	libmodal.mode.enter('FOO', fooModeCombos)
+	libmodal.mode.enter('FOO', fooModeKeymaps)
 <
 
 Exit Supression ~
@@ -402,24 +402,24 @@ Using a callback `function`: >
 <
 
 Using a |key-mapping| `dict`: >
-	let s:barModeCombos = {
+	let s:barModeKeymaps = {
 	\	'': 'echom "You cant exit using escape."',
 	\	'q': 'let g:barModeExit = 1'
 	\}
 
 	let g:barModeExit = 0
-	call libmodal#Enter('BAR', s:barModeCombos, 1)
+	call libmodal#Enter('BAR', s:barModeKeymaps, 1)
 <
 
 Using a |key-mapping| `table`: >
 	local libmodal = require('libmodal')
-	local fooModeCombos = {
+	local fooModeKeymaps = {
 		[''] = 'echom "You cant exit using escape."',
 		q = 'let g:fooModeExit = 1'
 	}
 
 	vim.g.fooModeExit = false
-	libmodal.mode.enter('FOO', fooModeCombos, true)
+	libmodal.mode.enter('FOO', fooModeKeymaps, true)
 <
 
 Submodes ~
@@ -451,13 +451,13 @@ Using a callback `function`: >
 Using a |key-mapping| `table`: >
 	let s:barModeRecurse = 0
 
-	let s:barModeCombos = {
+	let s:barModeKeymaps = {
 	\	'z': 'BarModeEnter',
 	\}
 
 	function! s:BarMode()
 		let s:barModeRecurse += 1
-		call libmodal#Enter('BAR' . s:barModeRecurse, s:barModeCombos)
+		call libmodal#Enter('BAR' . s:barModeRecurse, s:barModeKeymaps)
 		let s:barModeRecurse -= 1
 	endfunction
 
@@ -468,13 +468,13 @@ Using a |key-mapping| `table`: >
 Using a |key-mapping| `table`: >
 	local libmodal = require('libmodal')
 	local fooModeRecurse = 0
-	local fooModeCombos = {
+	local fooModeKeymaps = {
 		z = 'lua fooMode()'
 	}
 
 	function fooMode()
 		fooModeRecurse = fooModeRecurse + 1
-		libmodal.mode.enter('FOO' .. fooModeRecurse, fooModeCombos)
+		libmodal.mode.enter('FOO' .. fooModeRecurse, fooModeKeymaps)
 		fooModeRecurse = fooModeRecurse - 1
 	end
 

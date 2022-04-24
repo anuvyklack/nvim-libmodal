@@ -1,53 +1,45 @@
---[[/* IMPORTS */]]
+local globals = require 'libmodal/src/globals'
+local utils   = require 'libmodal/src/utils'
 
-local globals   = require('libmodal/src/globals')
-local utils     = require('libmodal/src/utils')
-local Vars      = require('libmodal/src/Vars')
-
---[[/* MODULE */]]
-
-local Prompt = {TYPE = 'libmodal-prompt'}
-
-local _HELP = 'help'
-local _REPLACEMENTS = {
+local HELP = 'help'
+local REPLACEMENTS =
+{
 	'(', ')', '[', ']', '{', '}',
 	'=', '+', '<', '>', '^',
 	',', '/', ':', '?', '@', '!', '$', '*', '.', '%', '&', '\\',
 }
-for i, replacement in ipairs(_REPLACEMENTS) do
-	_REPLACEMENTS[i], _ = vim.pesc(replacement)
+
+for i, replacement in ipairs(REPLACEMENTS) do
+	REPLACEMENTS[i], _ = vim.pesc(replacement)
 end
 
---[[
-	/*
-	 * META `Prompt`
-	 */
---]]
+--- @class libmodal.Prompt
+--- @field private completions table<string>|nil
+--- @field private exit libmodal.utils.Vars
+--- @field private indicator libmodal.utils.Indicator
+--- @field private input libmodal.utils.Vars
+--- @field private instruction function|table<string, function|string>
+--- @field private help libmodal.utils.Help|nil
+--- @field private name string
+--- @field private supress_exit boolean
+local Prompt = utils.classes.new()
 
-local _metaPrompt = require('libmodal/src/classes').new(Prompt.TYPE)
-
----------------------------------------------------
---[[ SUMMARY:
-	* Execute the specified instruction based on user input.
-]]
---[[ PARAMS:
-	* `userInput` => the input from the user, used to determine how to execute the `self._instruction`.
-]]
----------------------------------------------------
-function _metaPrompt:_executeInstruction(userInput)
+--- Execute the instruction specified by the `user_input`.
+--- @param user_input string
+function Prompt:execute_instruction(user_input)
 	-- get the instruction for the mode.
-	local instruction = self._instruction
+	local instruction = self.instruction
 
 	if type(instruction) == globals.TYPE_TBL then -- The instruction is a command table.
-		if instruction[userInput] then -- There is a defined command for the input.
-			local to_execute = instruction[userInput]
+		if instruction[user_input] then -- There is a defined command for the input.
+			local to_execute = instruction[user_input]
 			if type(to_execute) == globals.TYPE_FUNC then
 				to_execute()
 			else
-				vim.api.nvim_command(instruction[userInput])
+				vim.api.nvim_command(instruction[user_input])
 			end
-		elseif userInput == _HELP then -- The user did not define a 'help' command, so use the default.
-			self._help:show()
+		elseif user_input == HELP then -- The user did not define a 'help' command, so use the default.
+			self.help:show()
 		else -- show an error.
 			utils.api.nvim_show_err(globals.DEFAULT_ERROR_TITLE, 'Unknown command')
 		end
@@ -58,14 +50,11 @@ function _metaPrompt:_executeInstruction(userInput)
 	end
 end
 
----------------------------------
---[[ SUMMARY:
-	* Loop to get user input with `input()`.
-]]
----------------------------------
-function _metaPrompt:_inputLoop()
+--- Get more input from the user.
+--- @return boolean more_input
+function Prompt:input()
 	-- If the mode is not handling exit events automatically and the global exit var is true.
-	if self.exit.supress and globals.is_true(self.exit:nvimGet()) then
+	if self.supress_exit and globals.is_true(self.exit:get()) then
 		return false
 	end
 
@@ -73,10 +62,10 @@ function _metaPrompt:_inputLoop()
 	utils.api.nvim_redraw()
 
 	-- determine what to do with the input
-	local function userInputCallback(userInput)
-		if userInput and string.len(userInput) > 0 then -- The user actually entered something.
-			self.input:nvimSet(userInput)
-			self:_executeInstruction(userInput)
+	local function user_input_callback(user_input)
+		if user_input and string.len(user_input) > 0 then -- The user actually entered something.
+			self.input:set(user_input)
+			self:execute_instruction(user_input)
 		else -- indicate we want to leave the prompt
 			return false
 		end
@@ -88,101 +77,79 @@ function _metaPrompt:_inputLoop()
 	vim.api.nvim_command('echohl ' .. self.indicator.hl)
 
 	-- set the user input variable
-	if self._completions then
+	if self.completions then
 		vim.api.nvim_command('echo "' .. self.indicator.str .. '"')
-		return vim.ui.select(self._completions, {}, userInputCallback)
+		return vim.ui.select(self.completions, {}, user_input_callback)
 	else
-		return vim.ui.input({prompt = self.indicator.str}, userInputCallback)
+		return vim.ui.input({prompt = self.indicator.str}, user_input_callback)
 	end
 end
 
-----------------------------
---[[ SUMMARY:
-	* Enter a prompt 'mode'.
-]]
-----------------------------
-function _metaPrompt:enter()
+--- Enter the prompt.
+function Prompt:enter()
 	-- enter the mode using a loop.
-	local continueMode = true
-	while continueMode do
-		local noErrors, promptResult = pcall(self._inputLoop, self)
+	local continue_mode = true
+	while continue_mode do
+		local no_errors, prompt_result = pcall(self.input, self)
 
 		-- if there were errors.
-		if not noErrors then
-			utils.show_error(promptResult)
-			continueMode = true
+		if not no_errors then
+			utils.show_error(prompt_result)
+			continue_mode = true
 		else
-			continueMode = promptResult
+			continue_mode = prompt_result
 		end
 	end
 end
 
---[[
-	/*
-	 * CLASS `Prompt`
-	 */
---]]
+return
+{
+	-------------------------------------------
+	--- Enter a prompt.
+	--- @param name string the name of the prompt
+	--- @param instruction function|table<string, function|string> what to do with user input
+	--- @param user_completions table<string>|nil a list of possible inputs, provided by the user
+	--- @param supress_exit boolean|nil whether to stop the `<Esc>` key from quitting the mode
+	new = function(name, instruction, user_completions, supress_exit)
+		name = vim.trim(name)
 
--------------------------------------------
---[[ SUMMARY:
-	* Enter a prompt.
-]]
---[[ PARAMS:
-	* `name` => the prompt name.
-	* `instruction` => the prompt callback, or mode command table.
-	* `...` => a completions table.
-]]
--------------------------------------------
-function Prompt.new(name, instruction, ...)
-	name = vim.trim(name)
+		local self = setmetatable(
+			{
+				exit         = utils.Vars.new('exit', name),
+				indicator    = utils.Indicator.prompt(name),
+				input        = utils.Vars.new('input', name),
+				instruction = instruction,
+				name        = name
+			},
+			Prompt
+		)
 
-	local self = setmetatable(
-		{
-			exit         = Vars.new('exit', name),
-			indicator    = require('libmodal/src/Indicator').prompt(name),
-			input        = require('libmodal/src/Vars').new('input', name),
-			_instruction = instruction,
-			_name        = name
-		},
-		_metaPrompt
-	)
+		self.supress_exit = supress_exit or false
 
-	-- get the arguments
-	local userCompletions, supressExit = unpack({...})
+		-- get the completion list.
+		if type(instruction) == globals.TYPE_TBL then -- unload the keys of the mode command table.
+			-- Create one if the user specified a command table.
+			local completions   = {}
+			local contained_help = false
 
-	self.exit.supress = supressExit or false
-
-	-- get the completion list.
-	if type(instruction) == globals.TYPE_TBL then -- unload the keys of the mode command table.
-		-- Create one if the user specified a command table.
-		local completions   = {}
-		local containedHelp = false
-
-		for command, _ in pairs(instruction) do
-			completions[#completions + 1] = command
-			if command == _HELP then containedHelp = true
+			for command, _ in pairs(instruction) do
+				completions[#completions + 1] = command
+				if command == HELP then
+					contained_help = true
+				end
 			end
+
+			if not contained_help then -- assign it.
+				completions[#completions + 1] = HELP
+				self.help = utils.Help.new(instruction, 'COMMAND')
+			end
+
+			self.completions = completions
+		elseif user_completions then
+			-- Use the table that the user gave.
+			self.completions = user_completions
 		end
 
-		if not containedHelp then -- assign it.
-			completions[#completions + 1] = _HELP
-			self._help = utils.Help.new(instruction, 'COMMAND')
-		end
-
-		self._completions = completions
-	elseif userCompletions then
-		-- Use the table that the user gave.
-		self._completions = userCompletions
+		return self
 	end
-
-	return self
-end
-
-
---[[
-	/*
-	 * PUBLICIZE MODULE
-	 */
---]]
-
-return Prompt
+}

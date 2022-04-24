@@ -1,9 +1,14 @@
 --[[/* MODULE */]]
 
-local utils       = {}
-utils.api         = require('libmodal/src/utils/api')
-utils.Help        = require('libmodal/src/utils/Help')
-utils.WindowState = require('libmodal/src/utils/WindowState')
+local utils =
+{
+	api   = require 'libmodal/src/utils/api',
+	classes = require 'libmodal/src/utils/classes',
+	Indicator = require 'libmodal/src/utils/api/Indicator',
+	Help = require 'libmodal/src/utils/api/Help',
+   Popup = require 'libmodal/src/utils/Popup',
+   Vars  = require 'libmodal/src/utils/Vars',
+}
 
 --[[/* FUNCTIONS */]]
 
