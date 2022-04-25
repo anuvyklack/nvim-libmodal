@@ -52,15 +52,22 @@ function Prompt:get_user_input()
 	-- clear previous `echo`s.
 	utils.api.nvim_redraw()
 
-	local continue_prompt -- if `true`, loop this prompt again
+	local continue_prompt -- will set to true `true` if looping this prompt again
 
-	-- determine what to do with the input
+	--- 1. Set `g:<mode_name>ModeInput` to `user_input`
+	--- 2. Execute any commands indicated by `user_input`
+	--- 3. Read `g:<mode_name>ModeExit` to see if we should `continue_prompt`
+	--- @param user_input string
 	local function user_input_callback(user_input)
-		if user_input and string.len(user_input) > 0 then -- The user actually entered something.
+		if user_input and string.len(user_input) > 0 then -- the user actually entered something.
 			self.input:set(user_input)
 			self:execute_instruction(user_input)
-			continue_prompt = self.exit:get() or true
-		else
+
+			local should_exit = self.exit:get()
+			if should_exit ~= nil then
+				continue_prompt = not should_exit
+			end
+		else -- the user entered nothing.
 			continue_prompt = false
 		end
 	end
@@ -76,7 +83,7 @@ function Prompt:get_user_input()
 		vim.ui.input({prompt = self.indicator.str}, user_input_callback)
 	end
 
-	return continue_prompt
+	return continue_prompt == nil and true or continue_prompt
 end
 
 --- Enter the prompt.
