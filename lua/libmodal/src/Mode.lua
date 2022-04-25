@@ -51,25 +51,23 @@ function Mode:check_input_for_mapping()
 	self.flush_input_timer:stop()
 
 	-- Append the latest input to the locally stored input history.
-	local input_bytes = self.input_bytes
-
-	input_bytes[#input_bytes + 1] = self.input:get()
+	self.input_bytes[#self.input_bytes + 1] = self.input:get()
 
 	-- Get the command based on the users input.
-	local cmd = self.mappings:get(input_bytes)
+	local cmd = self.mappings:get(self.input_bytes)
 
 	-- Get the type of the command.
 	local command_type = type(cmd)
 
 	-- if there was no matching command
 	if not cmd then
-		if #input_bytes < 2 and input_bytes[1] == string.byte(HELP) then
+		if #self.input_bytes < 2 and self.input_bytes[1] == string.byte(HELP) then
 			self.help:show()
 		end
-		input_bytes:clear()
+		self.input_bytes:clear()
 	-- The command was a table, meaning that it MIGHT match.
 	elseif command_type == globals.TYPE_TBL
-		and globals.is_true(self.timeouts.enabled)
+		and globals.is_true(self.timeouts_enabled)
 	then
 		-- start the timer
 		self.flush_input_timer:start(
@@ -81,18 +79,18 @@ function Mode:check_input_for_mapping()
 					self.execute_instruction(cmd[ParseTable.CR])
 				end
 				-- clear input
-				input_bytes:clear()
-				self.popups:peek():refresh(input_bytes)
+				self.input_bytes:clear()
+				self.popups:peek():refresh(self.input_bytes)
 			end)
 		)
 
 	-- The command was an actual vim command.
 	else
 		self.execute_instruction(cmd)
-		input_bytes:clear()
+		self.input_bytes:clear()
 	end
 
-	self.popups:peek():refresh(input_bytes)
+	self.popups:peek():refresh(self.input_bytes)
 end
 
 --- Enter this mode.
@@ -128,7 +126,7 @@ end
 --- @return boolean more_input
 function Mode:input()
 	-- If the mode is not handling exit events automatically and the global exit var is true.
-	if self.exit_supress
+	if self.supress_exit
 	   and globals.is_true(self.exit:get())
 	then
 		return false
@@ -148,7 +146,7 @@ function Mode:input()
 	-- Set the global input variable to the new input.
 	self.input:set(user_input)
 
-	if not self.exit_supress and user_input == globals.ESC_NR then -- The user wants to exit.
+	if not self.supress_exit and user_input == globals.ESC_NR then -- The user wants to exit.
 		return false -- As in, "I don't want to continue."
 	else -- The user wants to continue.
 

@@ -24,40 +24,26 @@ for i, replacement in ipairs(REPLACEMENTS) do
 	REPLACEMENTS[i], _ = vim.pesc(replacement)
 end
 
---- @class libmodal.Prompt
---- @field private completions table<string>|nil
---- @field private exit libmodal.utils.Vars
---- @field private indicator libmodal.utils.Indicator
---- @field private input libmodal.utils.Vars
---- @field private instruction function|table<string, function|string>
---- @field private help libmodal.utils.Help|nil
---- @field private name string
---- @field private supress_exit boolean
-local Prompt = utils.classes.new()
-
 --- Execute the instruction specified by the `user_input`.
 --- @param user_input string
 function Prompt:execute_instruction(user_input)
-	-- get the instruction for the mode.
-	local instruction = self.instruction
-
-	if type(instruction) == globals.TYPE_TBL then -- The instruction is a command table.
-		if instruction[user_input] then -- There is a defined command for the input.
-			local to_execute = instruction[user_input]
+	if type(self.instruction) == globals.TYPE_TBL then -- The self.instruction is a command table.
+		if self.instruction[user_input] then -- There is a defined command for the input.
+			local to_execute = self.instruction[user_input]
 			if type(to_execute) == globals.TYPE_FUNC then
 				to_execute()
 			else
-				vim.api.nvim_command(instruction[user_input])
+				vim.api.nvim_command(to_execute)
 			end
 		elseif user_input == HELP then -- The user did not define a 'help' command, so use the default.
 			self.help:show()
 		else -- show an error.
 			utils.api.nvim_show_err(globals.DEFAULT_ERROR_TITLE, 'Unknown command')
 		end
-	elseif type(instruction) == globals.TYPE_STR then -- The instruction is a function.
-		vim.fn[instruction]()
-	else -- attempt to call the instruction.
-		instruction()
+	elseif type(self.instruction) == globals.TYPE_STR then -- The self.instruction is a function.
+		vim.fn[self.instruction]()
+	else -- attempt to call the self.instruction.
+		self.instruction()
 	end
 end
 
