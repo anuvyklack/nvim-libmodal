@@ -23,11 +23,6 @@ function api.nvim_bell()
 	vim.api.nvim_command('normal '..string.char(27)) -- escape char
 end
 
---- Gets one character of user input, as a number.
-function api.nvim_input()
-	return vim.fn.getchar()
-end
-
 --- Run the `mode` command to refresh the screen.
 function api.nvim_redraw()
 	vim.api.nvim_command 'mode'

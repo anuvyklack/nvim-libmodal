@@ -138,7 +138,7 @@ function Mode:input()
 	utils.api.nvim_lecho(self.indicator)
 
 	-- Capture input.
-	local user_input = utils.api.nvim_input()
+	local user_input = vim.fn.getchar()
 
 	-- Return if there was a timeout event.
 	if user_input == TIMEOUT.CHAR_NUMBER then
