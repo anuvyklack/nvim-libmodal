@@ -1,6 +1,17 @@
 local globals = require 'libmodal/src/globals'
 local utils   = require 'libmodal/src/utils'
 
+--- @class libmodal.Prompt
+--- @field private completions table<string>|nil
+--- @field private exit libmodal.utils.Vars
+--- @field private help libmodal.utils.Help|nil
+--- @field private indicator libmodal.utils.Indicator
+--- @field private input libmodal.utils.Vars
+--- @field private instruction function|table<string, function|string>
+--- @field private name string
+--- @field private supress_exit boolean
+local Prompt = utils.classes.new()
+
 local HELP = 'help'
 local REPLACEMENTS =
 {
