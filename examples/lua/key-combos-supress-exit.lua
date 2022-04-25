@@ -2,7 +2,8 @@
 local libmodal = require 'libmodal'
 
 -- Register key commands and what they do.
-local fooModeKeymaps = {
+local fooModeKeymaps =
+{
 	[''] = 'echom "You cant exit using escape."',
 	q = 'let g:fooModeExit = 1'
 }

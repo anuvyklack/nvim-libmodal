@@ -101,12 +101,12 @@ end
 
 return
 {
-	-------------------------------------------
 	--- Enter a prompt.
 	--- @param name string the name of the prompt
 	--- @param instruction function|table<string, function|string> what to do with user input
 	--- @param user_completions table<string>|nil a list of possible inputs, provided by the user
 	--- @param supress_exit boolean|nil whether to stop the `<Esc>` key from quitting the mode
+	--- @return libmodal.Prompt
 	new = function(name, instruction, user_completions, supress_exit)
 		name = vim.trim(name)
 

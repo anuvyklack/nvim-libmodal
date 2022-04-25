@@ -1,6 +1,3 @@
---- The error that occurs when unkeymap a keymap that doesn't exist
-local ERR_NO_MAP = 'E5555: API call: E31: No such keymap'
-
 --- Remove and return the right-hand side of a `keymap`.
 --- @param keymap table the keymap to unpack
 --- @return string lhs, table options
@@ -39,7 +36,7 @@ function Layer:enter()
 	     1. Populate a list of keymaps which will be overwritten to `existing_keymap`
 		 2. Apply the layer's keymappings. ]]
 	for mode, new_keymaps in pairs(self.layer_keymap) do
-		-- if `mode` key has not yet been made for `existingKeymap`.
+		-- if `mode` key has not yet been made for `existing_keymap`.
 		if not self.existing_keymap[mode] then
 			self.existing_keymap[mode] = {}
 		end
@@ -69,24 +66,22 @@ end
 --- @param options table options for the keymap.
 --- @see `vim.keymap.set`
 function Layer:map(mode, lhs, rhs, options)
-	if not self.existing_keymap then
-		error("Don't call this function before activating the layer; just add to the keymap passed to `Layer.new` instead.")
-	end
-
-	if not self.existing_keymap[mode][lhs] then -- the keymap's state has not been saved.
-		for _, existing_keymap in ipairs(vim.api.nvim_get_keymap(mode)) do -- check if it has a keymap
-			if existing_keymap.lhs == lhs then -- add it to the undo list
-				existing_keymap.lhs = nil
-				self.existing_keymap[mode][lhs] = existing_keymap
-				break
+	if self.existing_keymap then -- the layer has been activated
+		if not self.existing_keymap[mode][lhs] then -- the keymap's state has not been saved.
+			for _, existing_keymap in ipairs(vim.api.nvim_get_keymap(mode)) do -- check if it has a keymap
+				if existing_keymap.lhs == lhs then -- add it to the undo list
+					existing_keymap.lhs = nil
+					self.existing_keymap[mode][lhs] = existing_keymap
+					break
+				end
 			end
 		end
+
+		-- map the `lhs` to `rhs` in `mode` with `options` for the current buffer.
+		vim.keymap.set(mode, lhs, rhs, options)
 	end
 
-	-- map the `lhs` to `rhs` in `mode` with `options` for the current buffer.
-	vim.keymap.set(mode, lhs, rhs, options)
-
-	-- add the new keymap to the keymap
+	-- add the new mapping to the layer's keymap
 	options.rhs = rhs
 	self.layer_keymap[mode][lhs] = options
 end
@@ -100,15 +95,14 @@ function Layer:unmap(mode, lhs)
 		error("Don't call this function before activating the layer; just remove from the keymap passed to `Layer.new` instead.")
 	end
 
-	if self.existing_keymap[mode][lhs] then -- there is an older keymap to go back to.
-		-- undo the keymap
+	if self.existing_keymap[mode][lhs] then -- there is an older keymap to go back to, so undo this layer_keymap
 		local rhs, options = unpack_keymap_rhs(self.existing_keymap[mode][lhs])
 		vim.keymap.set(mode, lhs, rhs, options)
 	else
-		-- just delete the keymap.
-		local noErrors, err = pcall(vim.api.nvim_del_keymap, mode, lhs)
+		-- just make the keymap go back to default
+		local no_errors, err = pcall(vim.api.nvim_del_keymap, mode, lhs)
 
-		if not noErrors and err ~= ERR_NO_MAP then
+		if not no_errors and err ~= 'E31: No such mapping' then
 			print(err)
 		end
 	end
@@ -134,7 +128,7 @@ end
 return
 {
 	--- @param keymap table the keymaps (e.g. `{n = {gg = {rhs = 'G', silent = true}}}`)
-	--- @return table layer
+	--- @return libmodal.Layer
 	new = function(keymap)
 		return setmetatable({layer_keymap = keymap}, Layer)
 	end

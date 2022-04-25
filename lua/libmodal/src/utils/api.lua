@@ -37,8 +37,8 @@ function api.nvim_lecho(indicators)
 
 	api.nvim_redraw()
 
-	for _, hlTable in ipairs(indicators) do
-		vim.api.nvim_command('echohl ' .. hlTable.hl .. " | echon '" .. hlTable.str .. "'")
+	for _, indicator in ipairs(indicators) do
+		vim.api.nvim_command('echohl ' .. indicator.hl .. " | echon '" .. indicator.str .. "'")
 	end
 
 	vim.api.nvim_command 'echohl None'

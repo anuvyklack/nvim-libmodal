@@ -2,7 +2,8 @@
 local libmodal = require 'libmodal'
 
 -- Define commands through a dictionary.
-local commands = {
+local commands =
+{
 	new   = 'tabnew',
 	close = 'tabclose',
 	last  = 'tablast',

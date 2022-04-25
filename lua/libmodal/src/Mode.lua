@@ -186,9 +186,10 @@ end
 
 return
 {
-	--- Enter a mode.
+	--- Create a new mode.
 	--- @param name string the name of the mode.
 	--- @param instruction function|string|table a Lua function, keymap dictionary, Vimscript command.
+	--- @return libmodal.Mode
 	new = function(name, instruction, supress_exit)
 		name = vim.trim(name)
 

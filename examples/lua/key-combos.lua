@@ -8,7 +8,8 @@ local function split_twice()
 end
 
 -- Register keymaps for splitting windows and then closing windows
-local fooModeKeymaps = {
+local fooModeKeymaps =
+{
 	zf = 'split',
 	zfo = 'vsplit',
 	zfc = 'q',
