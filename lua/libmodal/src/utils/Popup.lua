@@ -53,12 +53,10 @@ end
 --- Display `input_bytes` in `self.buffer`
 --- @param input_bytes table<number> a list of character codes to display
 function Popup:refresh(input_bytes)
-	local input_bytesLen = #input_bytes
-
 	-- The user simply typed one more character onto the last one.
-	if input_bytesLen == #self.input_chars + 1 then
-		self.input_chars[input_bytesLen] = string.char(input_bytes[input_bytesLen])
-	elseif input_bytesLen == 1 then -- the user's typing was reset by a parser.
+	if #input_bytes == #self.input_chars + 1 then
+		self.input_chars[#input_bytes] = string.char(input_bytes[#input_bytes])
+	elseif #input_bytes == 1 then -- the user's typing was reset by a parser.
 		self.input_chars = {string.char(input_bytes[1])}
 	else -- other tries to optimize this procedure fell through, so do it the hard way.
 		self.input_chars = {}
