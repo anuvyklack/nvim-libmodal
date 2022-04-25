@@ -7,7 +7,7 @@ local commands =
 	new   = 'tabnew',
 	close = 'tabclose',
 	last  = 'tablast',
-	exit = libmodal.utils.api.mode_exit
+	exit = 'let g:fooModeExit = v:true',
 }
 
 -- Begin the prompt.

@@ -4,7 +4,7 @@ local libmodal = require('libmodal')
 -- Recurse counter.
 local foo_mode_recurse = 0
 -- Register 'z' as the map for recursing further (by calling the FooMode function again).
-local foo_mode_keymaps  =
+local foo_mode_keymaps =
 {
 	z = 'lua FooMode()'
 }
