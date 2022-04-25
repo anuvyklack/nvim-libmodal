@@ -9,7 +9,6 @@ local utils   = require 'libmodal/src/utils'
 --- @field private input libmodal.utils.Vars
 --- @field private instruction function|table<string, function|string>
 --- @field private name string
---- @field private supress_exit boolean
 local Prompt = utils.classes.new()
 
 local HELP = 'help'
@@ -50,24 +49,20 @@ end
 --- Get more input from the user.
 --- @return boolean more_input
 function Prompt:get_user_input()
-	-- If the mode is not handling exit events automatically and the global exit var is true.
-	if self.supress_exit and globals.is_true(self.exit:get()) then
-		return false
-	end
-
 	-- clear previous `echo`s.
 	utils.api.nvim_redraw()
+
+	local continue_prompt -- if `true`, loop this prompt again
 
 	-- determine what to do with the input
 	local function user_input_callback(user_input)
 		if user_input and string.len(user_input) > 0 then -- The user actually entered something.
 			self.input:set(user_input)
 			self:execute_instruction(user_input)
-		else -- indicate we want to leave the prompt
-			return false
+			continue_prompt = self.exit:get() or true
+		else
+			continue_prompt = false
 		end
-
-		return true
 	end
 
 	-- echo the highlighting
@@ -76,10 +71,12 @@ function Prompt:get_user_input()
 	-- set the user input variable
 	if self.completions then
 		vim.api.nvim_command('echo "' .. self.indicator.str .. '"')
-		return vim.ui.select(self.completions, {}, user_input_callback)
+		vim.ui.select(self.completions, {}, user_input_callback)
 	else
-		return vim.ui.input({prompt = self.indicator.str}, user_input_callback)
+		vim.ui.input({prompt = self.indicator.str}, user_input_callback)
 	end
+
+	return continue_prompt
 end
 
 --- Enter the prompt.
@@ -105,9 +102,8 @@ return
 	--- @param name string the name of the prompt
 	--- @param instruction function|table<string, function|string> what to do with user input
 	--- @param user_completions table<string>|nil a list of possible inputs, provided by the user
-	--- @param supress_exit boolean|nil whether to stop the `<Esc>` key from quitting the mode
 	--- @return libmodal.Prompt
-	new = function(name, instruction, user_completions, supress_exit)
+	new = function(name, instruction, user_completions)
 		name = vim.trim(name)
 
 		local self = setmetatable(
@@ -120,8 +116,6 @@ return
 			},
 			Prompt
 		)
-
-		self.supress_exit = supress_exit or false
 
 		-- get the completion list.
 		if type(instruction) == globals.TYPE_TBL then -- unload the keys of the mode command table.

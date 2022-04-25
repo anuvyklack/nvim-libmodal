@@ -126,9 +126,7 @@ end
 --- @return boolean more_input
 function Mode:get_user_input()
 	-- If the mode is not handling exit events automatically and the global exit var is true.
-	if self.supress_exit
-	   and globals.is_true(self.exit:get())
-	then
+	if self.supress_exit and globals.is_true(self.exit:get()) then
 		return false
 	end
 

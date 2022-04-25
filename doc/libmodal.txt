@@ -237,8 +237,8 @@ FUNCTIONS                                               *libmodal-usage-function
 		|nvim_set_keymap()|         For more information about {keymap}.
 
                       *libmodal-prompt* *libmodal#Prompt()*  *libmodal.prompt.enter()*
-`libmodal.prompt`.enter({name}, {instruction} [, {completions}, {supress_exit}])
-`libmodal`#Prompt({name}, {instruction} [, {completions}, {supress_exit}])
+`libmodal.prompt`.enter({name}, {instruction} [, {completions}])
+`libmodal`#Prompt({name}, {instruction} [, {completions}])
 
 	Besides accepting user input like keys in |Normal-mode|, |libmodal| is
 	also capable of prompting the user for |input| like |Cmdline-mode|. To
@@ -301,15 +301,8 @@ FUNCTIONS                                               *libmodal-usage-function
 			Note: If no `help` command is defined, one will be created
 			      automatically.
 
-		{supress_exit}  Whether or not to automatically exit the mode upon an
-                        <Esc> press.
-
-			- If |v:false|/`false`, then <Esc> is automatically mapped to
-              exiting.
-			- If |v:true|/`true`, then <Esc> is ignored unless specified by
-			  the user. In such cases, the user should set the
-			  `g:`{name}`ModeExit` variable to `true` when exiting is
-			  desired. See |libmodal-examples-supress-exit|.
+			Note: The user may set the `g:`{name}`ModeExit` variable to
+			      `true` at any time to prematurely exit.
 
 
 	See also: ~
