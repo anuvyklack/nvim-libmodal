@@ -83,7 +83,7 @@ function Prompt:input()
 end
 
 --- Enter the prompt.
-function Prompt:enter()
+function Prompt:get_user_input()
 	-- enter the mode using a loop.
 	local continue_mode = true
 	while continue_mode do

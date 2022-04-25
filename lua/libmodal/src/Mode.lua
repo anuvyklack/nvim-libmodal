@@ -108,7 +108,7 @@ function Mode:enter()
 	local continue_mode = true
 	while continue_mode do
 		-- Try (using pcall) to use the mode.
-		local no_errors, mode_result = pcall(self.input, self)
+		local no_errors, mode_result = pcall(self.get_user_input, self)
 
 		-- If there were errors, handle them.
 		if not no_errors then
@@ -124,7 +124,7 @@ end
 
 --- Get input from the user.
 --- @return boolean more_input
-function Mode:input()
+function Mode:get_user_input()
 	-- If the mode is not handling exit events automatically and the global exit var is true.
 	if self.supress_exit
 	   and globals.is_true(self.exit:get())
