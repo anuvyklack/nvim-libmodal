@@ -92,7 +92,7 @@ function Prompt:get_user_input()
 		-- if there were errors.
 		if not no_errors then
 			utils.show_error(prompt_result)
-			continue_mode = true
+			continue_mode = false
 		else
 			continue_mode = prompt_result
 		end

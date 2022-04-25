@@ -113,7 +113,7 @@ function Mode:enter()
 		-- If there were errors, handle them.
 		if not no_errors then
 			utils.show_error(mode_result)
-			continue_mode = true
+			continue_mode = false
 		else
 			continue_mode = mode_result
 		end
