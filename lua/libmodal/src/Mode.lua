@@ -229,11 +229,7 @@ return
 			self.timeouts = utils.Vars.new('timeouts', self.name)
 
 			-- Read the correct timeout variable.
-			if vim.g[self.timeouts:name()] == nil then
-				self.timeouts.enabled = vim.g.libmodalTimeouts
-			else
-				self.timeouts.enabled = self.timeouts:get()
-			end
+			self.timeouts_enabled = self.timeouts:get() or vim.g.libmodalTimeouts
 		end
 
 		return self
