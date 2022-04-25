@@ -16,7 +16,7 @@ local utils      = require 'libmodal/src/utils'
 --- @field private timeouts_enabled boolean
 local Mode = utils.classes.new()
 
-local InputBytes = utils.classes.new(nil,
+local InputBytes = utils.classes.new(
 {
 	clear = function(self)
 		for i, _ in ipairs(self) do
