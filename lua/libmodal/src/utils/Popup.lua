@@ -54,7 +54,7 @@ end
 --- @param input_bytes table<number> a list of character codes to display
 function Popup:refresh(input_bytes)
 	-- The user simply typed one more character onto the last one.
-	if #input_bytes == #self.input_chars + 1 then
+	if #input_bytes == (self.input_chars and #self.input_chars or 0) + 1 then
 		self.input_chars[#input_bytes] = string.char(input_bytes[#input_bytes])
 	elseif #input_bytes == 1 then -- the user's typing was reset by a parser.
 		self.input_chars = {string.char(input_bytes[1])}
