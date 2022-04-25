@@ -2,6 +2,18 @@ local globals    = require 'libmodal/src/globals'
 local ParseTable = require 'libmodal/src/collections/ParseTable'
 local utils      = require 'libmodal/src/utils'
 
+--- @class libmodal.Mode
+--- @field private exit libmodal.utils.Vars
+--- @field private flush_input_timer unknown
+--- @field private help libmodal.utils.Help|nil
+--- @field private indicator libmodal.utils.Indicator
+--- @field private input libmodal.utils.Vars
+--- @field private instruction function|table<string, function|string>
+--- @field private mappings libmodal.collections.ParseTable
+--- @field private name string
+--- @field private popups libmodal.collections.Stack
+--- @field private supress_exit boolean
+--- @field private timeouts_enabled boolean
 local Mode = utils.classes.new()
 
 local InputBytes = utils.classes.new(nil,
