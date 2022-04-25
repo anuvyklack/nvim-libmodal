@@ -4,8 +4,8 @@ local utils =
 {
 	api   = require 'libmodal/src/utils/api',
 	classes = require 'libmodal/src/utils/classes',
-	Indicator = require 'libmodal/src/utils/api/Indicator',
-	Help = require 'libmodal/src/utils/api/Help',
+	Indicator = require 'libmodal/src/utils/Indicator',
+	Help = require 'libmodal/src/utils/Help',
 	Popup = require 'libmodal/src/utils/Popup',
 	Vars  = require 'libmodal/src/utils/Vars',
 }
