@@ -1,5 +1,5 @@
 -- Imports
-local libmodal = require 'libmodal/src'
+local libmodal = require 'libmodal'
 
 -- create a new layer.
 local layer = libmodal.Layer.new(
