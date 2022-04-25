@@ -49,7 +49,7 @@ end
 
 --- Get more input from the user.
 --- @return boolean more_input
-function Prompt:input()
+function Prompt:get_user_input()
 	-- If the mode is not handling exit events automatically and the global exit var is true.
 	if self.supress_exit and globals.is_true(self.exit:get()) then
 		return false
@@ -83,11 +83,11 @@ function Prompt:input()
 end
 
 --- Enter the prompt.
-function Prompt:get_user_input()
+function Prompt:enter()
 	-- enter the mode using a loop.
 	local continue_mode = true
 	while continue_mode do
-		local no_errors, prompt_result = pcall(self.input, self)
+		local no_errors, prompt_result = pcall(self.get_user_input, self)
 
 		-- if there were errors.
 		if not no_errors then
